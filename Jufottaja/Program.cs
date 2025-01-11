@@ -31,7 +31,7 @@ try
     parser.HasFieldsEnclosedInQuotes = true;
 
     await using var writer = new StreamWriter(outputFilePath);
-    var apiClient = new ApiClient();
+    var apiClient = new ApiClient(new HttpClient());
     
     // Process headers
     var fileHeaders = parser.ReadFields();

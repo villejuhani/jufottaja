@@ -8,9 +8,9 @@ public partial class ApiClient
     private readonly HttpClient _httpClient;
     private const string BaseUrl = "https://jufo-rest.csc.fi/v1.1";
 
-    public ApiClient()
+    public ApiClient(HttpClient httpClient)
     {
-        _httpClient = new HttpClient();
+        _httpClient = httpClient;
     }
 
     public async Task<string> GetJufoChannelId(string name)
@@ -76,7 +76,7 @@ public partial class ApiClient
         }
         catch (HttpRequestException ex)
         {
-            throw new Exception("Network error while calling the JUFO API.", ex);
+            throw new Exception("Error while calling the JUFO API.", ex);
         }
     }
 
