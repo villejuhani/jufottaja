@@ -22,42 +22,70 @@ public class ApiClientTests
     public async Task GetJufoChannelId_ReturnsJufoId_WhenValidResponse()
     {
         // Arrange
-        const string name = "valid-name";
+        var jufoApiQueryParameters = new JufoApiQueryParameters
+        {
+            Name = "Valid Name"
+        };
         const string responseContent = "[{\"Jufo_ID\": \"12345\"}]";
 
         SetupHttpResponse(HttpStatusCode.OK, responseContent);
 
         // Act
-        var result = await _apiClient.GetJufoChannelId(name);
+        var result = await _apiClient.GetJufoChannelId(jufoApiQueryParameters);
 
         // Assert
         Assert.That(result, Is.EqualTo("12345"));
     }
 
     [Test]
-    public async Task GetJufoChannelId_ReturnsEmptyString_WhenResponseIsEmptyArray()
+    public async Task GetJufoChannelId_ReturnsNoResult_WhenResponseIsEmptyArray()
     {
         // Arrange
-        const string name = "valid-name";
-        const string responseContent = "[]";
+        var jufoApiQueryParameters = new JufoApiQueryParameters
+        {
+            Name = "Valid-Name"
+        };
+        const string responseContent = "";
 
         SetupHttpResponse(HttpStatusCode.OK, responseContent);
 
         // Act
-        var result = await _apiClient.GetJufoChannelId(name);
+        var result = await _apiClient.GetJufoChannelId(jufoApiQueryParameters);
 
         // Assert
-        Assert.That(result, Is.EqualTo(""));
+        Assert.That(result, Is.EqualTo("NO RESULT"));
+    }
+    
+    
+    [Test]
+    public async Task GetJufoChannelId_ReturnsMultipleResults_WhenResponseHasMultipleResults()
+    {
+        // Arrange
+        var jufoApiQueryParameters = new JufoApiQueryParameters
+        {
+            Name = "ValidName"
+        };
+        const string responseContent = "[{\"Jufo_ID\": \"12345\"}, {\"Jufo_ID\": \"54321\"}]";
+        SetupHttpResponse(HttpStatusCode.OK, responseContent);
+
+        // Act
+        var result = await _apiClient.GetJufoChannelId(jufoApiQueryParameters);
+
+        // Assert
+        Assert.That(result, Is.EqualTo("MULTIPLE RESULTS"));
     }
 
     [Test]
     public async Task GetJufoChannelId_ReturnsEmptyString_WhenInvalidName()
     {
         // Arrange
-        const string name = "invalid@name";
+        var jufoApiQueryParameters = new JufoApiQueryParameters
+        {
+            Name = "invalid@name"
+        };
 
         // Act
-        var result = await _apiClient.GetJufoChannelId(name);
+        var result = await _apiClient.GetJufoChannelId(jufoApiQueryParameters);
 
         // Assert
         Assert.That(result, Is.EqualTo(""));
@@ -67,11 +95,14 @@ public class ApiClientTests
     public async Task GetJufoChannelId_ThrowsException_OnHttpError()
     {
         // Arrange
-        const string name = "valid-name";
+        var jufoApiQueryParameters = new JufoApiQueryParameters
+        {
+            Name = "ValidName"
+        };
         SetupHttpResponse(HttpStatusCode.InternalServerError, "Server error");
 
         // Act & Assert
-        var ex = Assert.ThrowsAsync<Exception>(async () => await _apiClient.GetJufoChannelId(name));
+        var ex = Assert.ThrowsAsync<Exception>(async () => await _apiClient.GetJufoChannelId(jufoApiQueryParameters));
         Assert.That(ex?.Message, Is.EqualTo("Error while calling the JUFO API."));
     }
 

@@ -4,6 +4,87 @@ namespace Jufottaja.Tests;
 public class CsvHelperTests
 {
     [Test]
+        public void GetHeaderTypesAndFieldIndexes_AllHeadersPresent_ReturnsCorrectIndexes()
+        {
+            // Arrange
+            var fileHeaders = new[] { "Name", "Isbn", "Issn", "ConferenceAbbreviation" };
+            var headers = new Dictionary<HeaderType, string[]>
+            {
+                { HeaderType.Name, ["Name"] },
+                { HeaderType.Isbn, ["Isbn"] },
+                { HeaderType.Issn, ["Issn"] },
+                { HeaderType.ConferenceAbbreviation, ["ConferenceAbbreviation"] }
+            };
+
+            // Act
+            var result = CsvHelper.GetHeaderTypesAndFieldIndexes(fileHeaders, headers);
+
+            // Assert
+            Assert.That(result[HeaderType.Name], Has.Count.EqualTo(1));
+            Assert.That(result[HeaderType.Name][0], Is.EqualTo(0));
+            Assert.That(result[HeaderType.Isbn], Has.Count.EqualTo(1));
+            Assert.That(result[HeaderType.Isbn][0], Is.EqualTo(1));
+            Assert.That(result[HeaderType.Issn], Has.Count.EqualTo(1));
+            Assert.That(result[HeaderType.Issn][0], Is.EqualTo(2));
+            Assert.That(result[HeaderType.ConferenceAbbreviation], Has.Count.EqualTo(1));
+            Assert.That(result[HeaderType.ConferenceAbbreviation][0], Is.EqualTo(3));
+        }
+
+        [Test]
+        public void GetHeaderTypesAndFieldIndexes_SomeHeadersMissing_ReturnsOnlyExistingHeaders()
+        {
+            // Arrange
+            var fileHeaders = new[] { "Name", "ConferenceAbbreviation" };
+            var headers = new Dictionary<HeaderType, string[]>
+            {
+                { HeaderType.Name, ["Name"] },
+                { HeaderType.Isbn, ["Isbn"] },
+                { HeaderType.ConferenceAbbreviation, ["ConferenceAbbreviation"] }
+            };
+
+            // Act
+            var result = CsvHelper.GetHeaderTypesAndFieldIndexes(fileHeaders, headers);
+
+            // Assert
+            Assert.That(result[HeaderType.Name], Has.Count.EqualTo(1));
+            Assert.That(result[HeaderType.Name][0], Is.EqualTo(0));
+            Assert.That(result[HeaderType.Isbn], Is.Empty); // Missing header
+            Assert.That(result[HeaderType.ConferenceAbbreviation], Has.Count.EqualTo(1));
+            Assert.That(result[HeaderType.ConferenceAbbreviation][0], Is.EqualTo(1));
+        }
+
+        [Test]
+        public void GetHeaderTypesAndFieldIndexes_NoHeaders_ReturnsEmptyDictionary()
+        {
+            // Arrange
+            var fileHeaders = Array.Empty<string>();
+            var headers = new Dictionary<HeaderType, string[]>
+            {
+                { HeaderType.Name, ["Name"] }
+            };
+
+            // Act
+            var result = CsvHelper.GetHeaderTypesAndFieldIndexes(fileHeaders, headers);
+
+            // Assert
+            Assert.That(result[HeaderType.Name], Is.Empty);
+        }
+
+        [Test]
+        public void GetHeaderTypesAndFieldIndexes_EmptyHeaders_ReturnsEmptyIndexes()
+        {
+            // Arrange
+            var fileHeaders = new[] { "Name", "Type" };
+            var headers = new Dictionary<HeaderType, string[]>();
+
+            // Act
+            var result = CsvHelper.GetHeaderTypesAndFieldIndexes(fileHeaders, headers);
+
+            // Assert
+            Assert.That(result, Is.Empty);
+        }
+    
+    [Test]
     public void GetFieldIndexes_ReturnsCorrectIndexes_WhenFieldsMatchValues()
     {
         // Arrange

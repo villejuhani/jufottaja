@@ -1,9 +1,9 @@
-﻿using System.Text.Json;
-using System.Text.RegularExpressions;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace Jufottaja;
 
-public partial class ApiClient
+public class ApiClient
 {
     private readonly HttpClient _httpClient;
     private const string BaseUrl = "https://jufo-rest.csc.fi/v1.1";
@@ -13,29 +13,43 @@ public partial class ApiClient
         _httpClient = httpClient;
     }
 
-    public async Task<string> GetJufoChannelId(string name)
+    
+    /// <returns>
+    /// Jufo_ID as string if found,
+    /// "NO RESULT" if Jufo API returned nothing,
+    /// "MULTIPLE RESULTS" if Jufo API returned more than one result
+    /// empty string if parameter validation did not go through or Jufo API returned more than one result
+    /// </returns>
+    public async Task<string> GetJufoChannelId(JufoApiQueryParameters parameters)
     {
+        if (!AreQueryParametersValid(parameters))
+        {
+            return "";
+        }
+        
+        var queryString = BuildQueryString(parameters);
         try
         {
-            if (!IsValidName(name))
-            {
-                Console.WriteLine($"Invalid name parameter: '{name}'. Name must contain only a-Z, 0-9 and '-'");
-                return "";
-            }
-            
-            var url = $"{BaseUrl}/etsi.php?nimi={Uri.EscapeDataString(name)}";
+            var url = $"{BaseUrl}/etsi.php?{queryString}";
             var response = await _httpClient.GetStringAsync(url);
             
-            if (string.IsNullOrEmpty(response) || response == "{}")
+            if (string.IsNullOrEmpty(response))
             {
-                return "";
+                return "NO RESULT";
             }
             
             using var document = JsonDocument.Parse(response);
             var root = document.RootElement;
             if (root.ValueKind != JsonValueKind.Array || root.GetArrayLength() <= 0)
             {
-                return "";
+                return "NO RESULT";
+            }
+
+            if (root.GetArrayLength() > 1)
+            {
+                Console.WriteLine($"There are multiple results from Jufo for {parameters}");
+                Console.WriteLine("Check Jufo manually for the correct one. Skipping...");
+                return "MULTIPLE RESULTS";
             }
 
             var firstItem = root[0];
@@ -80,11 +94,35 @@ public partial class ApiClient
         }
     }
 
-    private static readonly Regex NameValidationRegex = MyRegex();
-    [GeneratedRegex("^[a-zA-Z0-9-]+$", RegexOptions.Compiled)]
-    private static partial Regex MyRegex();
-    private static bool IsValidName(string name)
+    private static bool AreQueryParametersValid(JufoApiQueryParameters parameters)
     {
-        return NameValidationRegex.IsMatch(name);
+        var validationResults = new List<ValidationResult>();
+        var validationContext = new ValidationContext(parameters);
+        
+        if (!Validator.TryValidateObject(parameters, validationContext, validationResults, true))
+        {
+            foreach (var validationResult in validationResults)
+            {
+                Console.WriteLine($"Validation Error: {validationResult.ErrorMessage}");
+            }
+        }
+
+        return validationResults.Count == 0;
+    }
+    
+    private static string BuildQueryString(JufoApiQueryParameters parameters)
+    {
+        var queryParams = new Dictionary<string, string>();
+
+        if (!string.IsNullOrEmpty(parameters.Name))
+            queryParams["nimi"] = parameters.Name;
+        if (!string.IsNullOrEmpty(parameters.Isbn))
+            queryParams["isbn"] = parameters.Isbn;
+        if (!string.IsNullOrEmpty(parameters.Issn))
+            queryParams["issn"] = parameters.Issn;
+        if (!string.IsNullOrEmpty(parameters.ConferenceAbbreviation))
+            queryParams["lyhenne"] = parameters.ConferenceAbbreviation;
+
+        return string.Join("&", queryParams.Select(kvp => $"{kvp.Key}={Uri.EscapeDataString(kvp.Value)}"));
     }
 }
