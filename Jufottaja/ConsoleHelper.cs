@@ -5,8 +5,8 @@ public static class ConsoleHelper
     public static Dictionary<HeaderType, string[]> GetHeaders()
     {
         Console.WriteLine("Specify the headers in your file used for finding Publication Channel in Jufo. Do not use dash '-' in the headers.");
-        Console.WriteLine("You have to specify the type aswell. The possible types are: name, isbn, issn, conferenceAbbreviation.");
-        Console.WriteLine("Example use: -name:Publisher,title,Conference Name -isbn:ISBN -issn:ISSN -type:Item Type");
+        Console.WriteLine("You have to specify the type as well. The possible types are: name, isbn, issn, conferenceAbbreviation.");
+        Console.WriteLine("Example use: -name:Publisher,title,Conference Name -isbn:ISBN -issn:ISSN -conferenceAbbreviation:Conference");
         Console.WriteLine("Enter your headers:");
         
         var input = Console.ReadLine();

@@ -111,10 +111,12 @@ class Program
                 {
                     var channelId = await apiClient.GetJufoChannelId(jufoApiQueryParameters);
 
-                    if (string.IsNullOrEmpty(channelId))
+                    if (string.Equals(channelId, "FAILURE"))
                     {
                         rows++;
                         failedApiCalls.Add(jufoApiQueryParameters);
+                        var fieldsAndFailure = new List<string>(fields) { "FAILED" };
+                        writer.WriteLine(string.Join(",", fieldsAndFailure.Select(CsvHelper.EscapeCsvField)));
                         writer.WriteLine(string.Join(",", fields.Select(CsvHelper.EscapeCsvField)));
                         Console.WriteLine($"Processed row {rows}");
                         continue;
@@ -149,7 +151,8 @@ class Program
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    writer.WriteLine(string.Join(",", fields.Select(CsvHelper.EscapeCsvField)));
+                    var fieldsAndFailure = new List<string>(fields) { "FAILED" };
+                    writer.WriteLine(string.Join(",", fieldsAndFailure.Select(CsvHelper.EscapeCsvField)));
                     failedApiCalls.Add(jufoApiQueryParameters);
                 }
 
