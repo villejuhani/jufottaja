@@ -30,11 +30,13 @@ Requirements for the csv:
 - Download for Windows (x64) from [Releases](https://github.com/villejuhani/jufottaja/releases).
 - Extract the zip file.
 
-### 2. Run the program
+### 2. Start the program
 - Run the following command on the command line from the directory where the Jufottaja.exe is located:
   - `.\Jufottaja.exe C:\path\to\your.csv`
     - replace "C:\path\to\your.csv" with the csv's filepath that you want to Jufo-rate
-- The program will prompt you to specify the table headers that include publication channel information
-  - Specify the headers in your file used for finding Publication Channel in Jufo. Do not use dash '-' in the headers.
-    You have to specify the type aswell. The possible types are: name, isbn, issn, conferenceAbbreviation.
-  - example: `-name: Publication Title, Conference Name -issn:ISSN` 
+   
+### 3. Specify headers:
+- Specify the headers in your file used for finding Publication Channel in Jufo. Do not use dash '-' in the headers. You have to specify the type aswell. The possible types are: name, isbn, issn, conferenceAbbreviation.
+  - Example use: `-name: Publication Title, Conference Name -issn:ISSN`
+ 
+The program will go through the csv file and create a copy of it with Jufo levels in the same location of the csv file specified at the start up.
