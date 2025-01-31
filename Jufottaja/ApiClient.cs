@@ -18,13 +18,13 @@ public class ApiClient
     /// Jufo_ID as string if found,
     /// "NO RESULT" if Jufo API returned nothing,
     /// "MULTIPLE RESULTS" if Jufo API returned more than one result
-    /// empty string if parameter validation did not go through or Jufo API returned more than one result
+    /// "FAILURE" if parameter validation did not go through or if the Jufo API return cannot be parsed.
     /// </returns>
     public async Task<string> GetJufoChannelId(JufoApiQueryParameters parameters)
     {
         if (!AreQueryParametersValid(parameters))
         {
-            return "";
+            return "FAILURE";
         }
         
         var queryString = BuildQueryString(parameters);
@@ -55,10 +55,10 @@ public class ApiClient
             var firstItem = root[0];
             if (firstItem.TryGetProperty("Jufo_ID", out var jufoIdProperty))
             {
-                return jufoIdProperty.GetString() ?? "";
+                return jufoIdProperty.GetString() ?? "FAILURE";
             }
-
-            return "";
+            
+            return "FAILURE";
         }
         catch (HttpRequestException ex)
         {
