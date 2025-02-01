@@ -76,7 +76,7 @@ public class ApiClientTests
     }
 
     [Test]
-    public async Task GetJufoChannelId_ReturnsEmptyString_WhenInvalidName()
+    public async Task GetJufoChannelId_ReturnsFailure_WhenInvalidName()
     {
         // Arrange
         var jufoApiQueryParameters = new JufoApiQueryParameters
@@ -88,7 +88,7 @@ public class ApiClientTests
         var result = await _apiClient.GetJufoChannelId(jufoApiQueryParameters);
 
         // Assert
-        Assert.That(result, Is.EqualTo(""));
+        Assert.That(result, Is.EqualTo("FAILURE"));
     }
 
     [Test]

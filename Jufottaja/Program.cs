@@ -117,7 +117,6 @@ class Program
                         failedApiCalls.Add(jufoApiQueryParameters);
                         var fieldsAndFailure = new List<string>(fields) { "FAILED" };
                         writer.WriteLine(string.Join(",", fieldsAndFailure.Select(CsvHelper.EscapeCsvField)));
-                        writer.WriteLine(string.Join(",", fields.Select(CsvHelper.EscapeCsvField)));
                         Console.WriteLine($"Processed row {rows}");
                         continue;
                     }
