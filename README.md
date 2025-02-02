@@ -7,10 +7,12 @@ Give a csv file containing a table of publication channel names to Jufottaja and
 - create a copy of the csv file (copy will be called jufotettu.csv)
 - add a 'Jufo' column to the copy
   - which includes a result from trying to find a Jufo level:
-    - A Jufo level (1-3)
-    - NO LEVEL (i.e. Jufo level 0)
-    - MULTIPLE POSSIBILITIES (you have to find the level manually)
-    - FAILED (you have to find the level manually) 
+    - A Jufo level (0-3)
+    - MULTIPLE POSSIBILITIES (you have to find the correct level manually)
+    - FAILED (you have to find the level manually)
+    - NO LEVEL
+      - which means that Jufo has not rated the publication channel
+      - or rating was searched with too verbose publication channel name. For example "VLDB 2001 - Proceedings of 27th International Conference on Very Large Data Bases" results in no level, but "International Conference on Very Large Data Bases" does have a level in Jufo. Thus I suggest checking the NO LEVEL ones manually  
  
 Jufo level can be searched with these parameters:
 - Publication channel name
